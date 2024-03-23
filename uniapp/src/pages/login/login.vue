@@ -48,7 +48,7 @@
               :border="false"
             />
             <navigator
-              url="/bundle/pages/set_pwd/index?type=5"
+              url="/pages/forget_pwd/forget_pwd"
               hover-class="none"
             >
               <view

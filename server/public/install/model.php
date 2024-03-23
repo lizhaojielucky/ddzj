@@ -321,6 +321,11 @@ class installModel
 
         /* Get mysql version. */
         $version = $this->getMysqlVersion();
+        if($version < 5.7){
+            $return->result = 'fail';
+            $return->error = 'MySQL版本不能小于5.7';
+            return $return;
+        }
 
         /* check mysql sql_model */
         if(!$this->checkSqlMode($version)) {

@@ -1,7 +1,7 @@
 <?php
 return [
     // 系统版本号
-    'version' => '1.1.3',
+    'version' => '1.2.0',
 
     // 官网
     'website' => [
@@ -25,7 +25,7 @@ return [
 
     // 商城用户token（登录令牌）配置
     'user_token' => [
-        'expire_duration' => 3600 * 8,//用户token过期时长(单位秒）
+        'expire_duration' => 3600 * 24 * 7,//用户token过期时长(单位秒）
         'be_expire_duration' => 3600,//用户token临时过期前时长，自动续期
     ],
 

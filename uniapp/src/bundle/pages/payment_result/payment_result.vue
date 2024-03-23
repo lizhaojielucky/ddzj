@@ -54,7 +54,6 @@
 
 <script lang="ts" setup>
 import { onLoad } from '@dcloudio/uni-app'
-import { getPayStatus } from '@/api/app'
 import { apiOrderDetail } from '@/api/order'
 import { PayFromType } from '@/enums/appEnums'
 import { reactive, shallowRef, unref, nextTick } from 'vue'

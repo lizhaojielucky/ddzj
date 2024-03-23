@@ -86,8 +86,18 @@ const accountRegister = async () => {
     if (!validateInput(formData.password) || !validateInput(formData.password_confirm))
         return uni.$u.toast('密码应为6-20位数字+英文')
     await register(formData)
-    uni.$u.toast('注册成功！')
-    uni.navigateBack()
+    // uni.$u.toast('注册成功！')
+    // uni.navigateBack()
+	uni.showToast({
+		title: '注册成功！',
+		icon: 'none',
+		duration: 1500,
+		complete: function() {
+			setTimeout(() => {
+				uni.navigateBack()
+			}, 1500)
+		}
+	})
 }
 </script>
 

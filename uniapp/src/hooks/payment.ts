@@ -1,7 +1,8 @@
 import { apiPayPayWay, apiPayPrepay } from '@/api/app'
-import { wxpay } from '@/utils/pay'
+import { wxpay,alipay } from '@/utils/pay'
 // import { toast } from '@/utils/util'
 import { getClient } from '@/utils/client'
+import { useUserStore } from '@/stores/user'
 
 /**
  * @description 支付函数钩子
@@ -33,6 +34,22 @@ export function usePay() {
      */
     const handlePayPrepay = async (params: any): Promise<void> => {
         try {
+			const userStore = useUserStore()
+			if (userStore.userInfo.pay_auth && params.pay_way == 1) {
+				uni.showModal({
+					content: '当前账号未微信授权，请前往个人设置授权',
+					confirmText: '前往授权',
+					success: function (res) {
+						if (res.confirm) {
+							uni.reLaunch({
+							    url: '/pages/user_set/user_set'
+							})
+						}
+					}
+				})
+				return
+			}
+			
             const res = await apiPayPrepay({
                 from: params.from || 'order',
                 pay_way: params.pay_way,
@@ -64,14 +81,25 @@ export function usePay() {
      */
     const handlePay = async (res: any, params: any): Promise<void> => {
         try {
-            // #ifdef MP
-            await wxpay(res.config)
-            uni.$u.toast('支付成功')
-            // #endif
+            // // #ifdef MP
+            // await wxpay(res.config)
+            // uni.$u.toast('支付成功')
+            // // #endif
 
-            // #ifdef H5
-            await wxpay(res.config)
-            // #endif
+            // // #ifdef H5
+            // await wxpay(res.config)
+            // // #endif
+			//支付方式:1-微信支付;2-支付宝支付;3-余额支付;
+			switch (params.pay_way) {
+			  case 1:
+			    await wxpay(res.config)
+			    break;
+			  case 2:
+			    await alipay(res.config)
+			    break;
+			  default:
+				uni.$u.toast('支付异常')
+			}
 
             const param = JSON.stringify({
                 order_id: params.order_id,
@@ -80,7 +108,7 @@ export function usePay() {
 
             if (params.from === 'recharge') {
                 return uni.reLaunch({
-                    url: '/bundle/pages/user_wallet/user_wallet'
+                    url: '/bundle/pages/user_wallet/user_wallet?isPay=true'
                 })
             }
             uni.reLaunch({ url: `/bundle/pages/payment_result/payment_result?param=${param}` })

@@ -58,7 +58,14 @@ export function getPayStatus(data: any) {
     return request.get({ url: '/mall.pay/status', data: data }, { isAuth: true })
 }
 
+// 获取支付结果
+export function getPayResult(params: any,token:string) {
+    return request.get({ url: '/pay/getPayResult', data: params, header: {token:token} })
+}
+
 export const apiPayPrepay = (params: any) => request.post({ url: '/pay/prepay', data: params })
+
+export const apiJumpPayPrepay = (params: any,token:string) => request.post({ url: '/pay/prepay', data: params, header: {token:token}})
 
 /**
  * @param { Object } params

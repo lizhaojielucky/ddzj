@@ -75,7 +75,7 @@
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onShow,onLoad } from '@dcloudio/uni-app'
 import { apiUserWallet } from '@/api/wallet'
 
 const walletData = ref<any>({
@@ -89,7 +89,12 @@ const getWalletData = () => {
         walletData.value = res
     })
 }
-
+onLoad((param) => {
+	const isPay = param.isPay
+	if(isPay) {
+		uni.$u.toast('支付成功')
+	}
+})
 onShow(() => {
     getWalletData()
 })

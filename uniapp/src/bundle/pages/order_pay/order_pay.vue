@@ -70,12 +70,35 @@
     <view class="bottom_box w-full p-[20rpx]">
         <button class="pay_btn" @click="onSubmitOrder">立即支付</button>
     </view>
+	<u-popup
+	    v-model="alipayShow"
+	    mode="bottom"
+	    height="600rpx"
+	    safe-area-inset-bottom
+	    border-radius="20"
+	    closeable
+	    @close="handleclose"
+	>
+	    <view style="padding: 60rpx 30rpx;display: flex;justify-content: center;align-items: center;flex-direction: column;">
+			<view style="font-size: 50rpx;margin: 10rpx 0 20rpx;">￥{{ payData.order_amount }}</view>
+	        <view class="flex row-between m-t-50" style="width: 100%;justify-content: space-between;font-weight: bold;">
+	            <text class="bold">支付方式</text>
+	            <text class="bold">支付宝</text>
+	        </view>
+	        <view class="p-20 m-t-50 m-b-50" style="width: 100%;background-color: #9e9e9e40;padding: 15rpx 15rpx;margin: 50rpx 0;">请复制链接,粘贴至浏览器并支付</view>
+	        <button @click="copyAlipayLink()" style="border-radius: 12rpx;width: 100%;height: 80rpx;line-height: 80rpx;font-size: 28rpx;color: white;background-color: #F36161;">复制链接</button>
+	    </view>
+	</u-popup>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 
 import { usePay } from '@/hooks/payment'
 import { onLoad } from '@dcloudio/uni-app'
+import { getToken } from '@/utils/auth'
+
+
+const token = getToken()
 
 //支付钩子
 const { initPayWay, handlePayPrepay } = usePay()
@@ -92,6 +115,35 @@ const payData: any = ref({
 // 支付方式:1-微信支付;2-支付宝支付;3-余额支付;
 const payWay = ref()
 const timeStamp = ref<number | string | undefined>()
+//支付宝支付弹窗
+const alipayShow = ref(false)
+//支付宝支付链接
+const alipayLink = ref('')
+//支付宝弹窗关闭
+function handleclose() {
+	const param = JSON.stringify({
+	    order_id: params.value.order_id,
+	    from: params.value.from
+	})
+	if(params.value.from == 'order') {
+		uni.reLaunch({
+		    url: `/bundle/pages/payment_result/payment_result?param=${param}`
+		})
+	}
+	if(params.value.from == 'recharge') {
+		uni.reLaunch({
+		    url: '/bundle/pages/user_wallet/user_wallet?isPay=true'
+		})
+	}
+	
+}
+//复制支付宝支付链接
+function copyAlipayLink() {
+	console.log(alipayLink.value)
+	uni.setClipboardData({
+		data: alipayLink.value
+	});
+}
 
 const initPlaceOrder = async () => {
     payData.value = await initPayWay({ ...params.value })
@@ -107,6 +159,29 @@ const onSubmitOrder = async () => {
         content: '确认支付吗？'
     })
     if (modelRes.cancel) return
+	
+	//支付宝支付
+	if(payWay.value == 2) {
+	
+		// #ifdef MP-WEIXIN
+		alipayLink.value = `${import.meta.env.VITE_APP_BASE_URL || ''}mobile/bundle/pages/toAlipay/toAlipay?order_id=${params.value.order_id}&from=${params.value.from}&pay_way=${payWay.value}&key=${token}`
+		alipayShow.value = true
+		return
+		// #endif
+		
+		//#ifdef H5
+		let ua = navigator.userAgent.toLowerCase()
+		if (ua.match(/MicroMessenger/i)) {
+			//微信浏览器环境
+			uni.reLaunch({
+			    url: `/bundle/pages/toAlipay/toAlipay?order_id=${params.value.order_id}&from=${params.value.from}&pay_way=${payWay.value}&key=${token}`
+			})
+			return
+		}
+		//#endif
+	}
+	
+	
 
     try {
         handlePayPrepay({
@@ -193,4 +268,5 @@ const handleCountDownEnd = async (e: any): Promise<void> => {
         text-align: center;
     }
 }
+
 </style>

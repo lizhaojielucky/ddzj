@@ -54,6 +54,9 @@ return array(
     'EasyWeChat\\' => array($vendorDir . '/overtrue/wechat/src'),
     'EasyWeChatComposer\\' => array($vendorDir . '/easywechat-composer/easywechat-composer/src'),
     'Cron\\' => array($vendorDir . '/dragonmantank/cron-expression/src/Cron'),
+    'Alipay\\EasySDK\\' => array($vendorDir . '/alipaysdk/easysdk/php/src'),
+    'AlibabaCloud\\Tea\\FileForm\\' => array($vendorDir . '/alibabacloud/tea-fileform/src'),
+    'AlibabaCloud\\Tea\\' => array($vendorDir . '/alibabacloud/tea/src'),
     'AlibabaCloud\\Client\\' => array($vendorDir . '/alibabacloud/client/src'),
     'Adbar\\' => array($vendorDir . '/adbario/php-dot-notation/src'),
 );
