@@ -1,0 +1,91 @@
+<template>
+    <div>
+        <div>
+            <draggable class="draggable" v-model="navLists" animation="300">
+                <template v-slot:item="{ element: item, index }">
+                    <div class="max-w-[400px]" :key="index">
+                        <div class="text-base" style="color: #6b7280">{{ item.link.name }}</div>
+                        <div class="bg-fill-light flex items-center w-full p-4 mb-4">
+                            <div class="ml-3 flex-1">
+                                <div class="flex">
+                                    <span class="text-tx-regular flex-none mr-3">菜单图标</span>
+                                    <material-picker
+                                        v-model="item.image"
+                                        upload-class="bg-body"
+                                        size="60px"
+                                    >
+                                        <template #upload>
+                                            <div class="upload-btn w-[60px] h-[60px]">
+                                                <icon name="el-icon-Plus" :size="20" />
+                                            </div>
+                                        </template>
+                                    </material-picker>
+                                </div>
+                                <div class="flex mt-[18px]">
+                                    <span class="text-tx-regular flex-none mr-3">菜单名称</span>
+                                    <!-- <link-picker v-model="item.link" /> -->
+                                    <el-input v-model="item.name" class="pr-2"></el-input>
+                                    <el-checkbox
+                                        class="m"
+                                        label="显示"
+                                        v-model="item.display"
+                                    ></el-checkbox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </draggable>
+        </div>
+    </div>
+</template>
+<script lang="ts" setup>
+import feedback from '@/utils/feedback'
+import type { PropType } from 'vue'
+import Draggable from 'vuedraggable'
+
+const props = defineProps({
+    modelValue: {
+        type: Array as PropType<any[]>,
+        default: () => []
+    },
+    max: {
+        type: Number,
+        default: 10
+    },
+    min: {
+        type: Number,
+        default: 1
+    }
+})
+
+const emit = defineEmits(['update:modelValue'])
+const navLists = computed({
+    get() {
+        return props.modelValue
+    },
+    set(value) {
+        emit('update:modelValue', value)
+    }
+})
+
+const handleAdd = () => {
+    if (props.modelValue?.length < props.max) {
+        props.modelValue.push({
+            image: '',
+            name: '导航名称',
+            link: {}
+        })
+    } else {
+        feedback.msgError(`最多添加${props.max}个`)
+    }
+}
+const handleDelete = (index: number) => {
+    if (props.modelValue?.length <= props.min) {
+        return feedback.msgError(`最少保留${props.min}个`)
+    }
+    props.modelValue.splice(index, 1)
+}
+</script>
+
+<style lang="scss" scoped></style>
